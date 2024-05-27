@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My YouTube Channel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #333;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+        }
+        .content {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+        }
+        .video-embed {
+            width: 60%;
+        }
+        .chat-box {
+            width: 35%;
+            background-color: white;
+            border: 1px solid #ddd;
+            padding: 10px;
+            height: 500px;
+            overflow-y: auto;
+        }
+        .chat-input {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #ddd;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .chat-input button {
+            padding: 10px;
+            margin-left: 10px;
+            border: none;
+            background-color: #333;
+            color: white;
+            border-radius: 5px;
+        }
+    </style>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Welcome to My YouTube Channel</h1>
+        <a href="https://www.youtube.com/channel/YOUR_CHANNEL_ID" target="_blank" style="color: white; text-decoration: none;">Visit My YouTube Channel</a>
+    </header>
+    <div class="content">
+        <div class="video-embed">
+            <iframe width="100%" height="400" src="https://www.youtube.com/embed?listType=user_uploads&list=YOUR_CHANNEL_NAME" frameborder="0" allowfullscreen></iframe>
+        </div>
+        <div class="chat-box" id="chat-box">
+            <!-- Messages will be appended here -->
+        </div>
+    </div>
+    <div class="chat-input">
+        <input type="text" id="chat-message" placeholder="Type your message here..." />
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script>
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        var database = firebase.database();
+
+        function sendMessage() {
+            var message = document.getElementById('chat-message').value;
+            if (message) {
+                var chatRef = database.ref('chats');
+                chatRef.push().set({
+                    "message": message
+                });
+                document.getElementById('chat-message').value = '';
+            }
+        }
+
+        var chatRef = database.ref('chats');
+        chatRef.on('child_added', function(snapshot) {
+            var html = "";
+            html += "<div>" + snapshot.val().message + "</div>";
+            document.getElementById('chat-box').innerHTML += html;
+        });
+    </script>
+</body>
+</html>
